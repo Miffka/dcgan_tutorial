@@ -1,0 +1,55 @@
+repos:
+    # general hooks to verify or beautify code
+    - repo: git://github.com/pre-commit/pre-commit-hooks
+      rev: v2.5.0
+      hooks:
+      - id: check-added-large-files
+        args: [--maxkb=100000]
+      - id: trailing-whitespace
+      - id: check-docstring-first
+      - id: check-json
+      - id: check-merge-conflict
+      - id: check-xml
+      - id: check-yaml
+      - id: detect-aws-credentials
+        args: [
+          --allow-missing-credentials,
+          --credentials-file, docker-compose/.env,
+        ]
+      - id: detect-private-key
+      - id: mixed-line-ending
+      - id: pretty-format-json
+        args: [--autofix]
+
+    # autoformat code with black formatter
+    - repo: https://github.com/psf/black
+      rev: 19.10b0
+      hooks:
+        - id: black
+          files: (^kate)
+          args: [-l 120]
+
+    # write a list of third-party modules to .isort.cfg
+    - repo: https://github.com/asottile/seed-isort-config
+      rev: v1.9.4
+      hooks:
+        - id: seed-isort-config
+          files: (^kate)
+          args: [--settings-path, kate]
+
+    # beautify and sort imports
+    - repo: https://github.com/pre-commit/mirrors-isort
+      rev: v4.3.21
+      hooks:
+        - id: isort
+          files: (^kate)
+          args: [--settings-path, kate]
+
+    # check code style
+    - repo: https://gitlab.com/pycqa/flake8
+      rev: 3.7.9
+      hooks:
+        - id: flake8
+          additional_dependencies: [flake8-isort==2.9.1, flake8-quotes==3.0.0]
+          files: (^kate)
+          args: [--config, kate/.flake8]
