@@ -24,6 +24,8 @@ def create_dataloader(args):
             ]
         ),
     )
+    if args.test_mode:
+        dataset = torch.utils.data.Subset(dataset, np.arange(args.test_size))
 
     dataloader = torch.utils.data.DataLoader(
         dataset, batch_size=args.batch_size, shuffle=True, num_workers=args.workers
@@ -45,11 +47,17 @@ if __name__ == "__main__":
         default=64,
         help="Spatial size of training images. All images will be resized to this size using a transformer.",
     )
+    parser.add_argument(
+        "--test_mode", action="store_true", help="Whether to take only a small batch of data (debug mode)"
+    )
+    parser.add_argument("--test_size", type=int, default=512, help="Size of dataset in debug mode")
     parser.add_argument("--out_dir", default=osp.join(model_config.data_dir, "images"))
 
     args = parser.parse_args()
 
     dataloader = create_dataloader(args)
+    print("Total batches in dataloader", len(dataloader))
+
     real_batch = next(iter(dataloader))
     fig = plt.figure(figsize=(8, 8))
     plt.axis("off")

@@ -1,6 +1,6 @@
 import os
 import os.path as osp
-import random
+
 import torch
 
 basedir = os.path.abspath(os.path.dirname(__file__))
@@ -16,6 +16,7 @@ class ModelConfig(object):
     root_dir = osp.realpath(osp.join(CURRENT_PATH, ".."))
     model_dir = osp.join(root_dir, "models")
     data_dir = osp.join(root_dir, "data")
+    log_dir = osp.join(root_dir, "logs")
 
 
 model_config = ModelConfig()
