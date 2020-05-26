@@ -24,6 +24,7 @@ if __name__ == "__main__":
     parser.add_argument("--verbose", action="store_true", help="Whether to print losses during training")
     parser.add_argument("--logdir", default=model_config.log_dir, help="Folder with tensorboard runs")
     parser.add_argument("--force_cpu", action="store_true", help="Whether to train on CPU")
+    parser.add_argument("--weights", default=None, help="File with network and optimizer weights")
 
     ### Data parameters ###
     parser.add_argument(
@@ -100,6 +101,25 @@ if __name__ == "__main__":
     optimizerD = optim.Adam(netD.parameters(), lr=args.lr, betas=(args.beta1, 0.999))
     optimizerG = optim.Adam(netG.parameters(), lr=args.lr, betas=(args.beta1, 0.999))
 
+    ### Upload weights if provided ###
+    if args.weights is not None:
+        checkpoint = torch.load(args.weights, map_location="cpu")
+        netG.load_state_dict(checkpoint["netG_state"])
+        netD.load_state_dict(checkpoint["netD_state"])
+        optimizerD.load_state_dict(checkpoint["optimizerD_state"])
+        for state in optimizerD.state.values():
+            for k, v in state.items():
+                if isinstance(v, torch.Tensor):
+                    state[k] = v.to(device)
+        optimizerG.load_state_dict(checkpoint["optimizerG_state"])
+        for state in optimizerG.state.values():
+            for k, v in state.items():
+                if isinstance(v, torch.Tensor):
+                    state[k] = v.to(device)
+        init_epoch = checkpoint["epoch"] + 1
+        iters = checkpoint["iteration"]
+        print(f"Loaded weights from {args.weights}")
+
     ### Train model ###
     train_gan(
         netD,
@@ -114,6 +134,8 @@ if __name__ == "__main__":
         args.nz,
         device,
         args.num_epochs,
+        init_epoch=init_epoch,
+        iters=iters,
         writer=writer,
         verbose=False,
         save_folder=save_folder,

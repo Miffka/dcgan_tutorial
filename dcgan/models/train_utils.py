@@ -18,20 +18,19 @@ def train_gan(
     nz,
     device,
     num_epochs,
+    init_epoch=0,
+    iters=0,
     writer=None,
     verbose=False,
     save_folder=None,
 ):
-    # Lists to keep track of progress
-    iters = 0
-
     print("Starting Training Loop...")
     netD.to(device)
     netG.to(device)
     # For each epoch
-    for epoch in range(num_epochs):
+    for epoch in range(init_epoch, num_epochs + init_epoch):
         # For each batch in the dataloader
-        for i, data in tqdm.tqdm(enumerate(dataloader, 0,), desc="Train", total=len(dataloader)):
+        for i, data in tqdm.tqdm(enumerate(dataloader, 0,), desc=f"Train epoch {epoch}", total=len(dataloader)):
 
             ############################
             # (1) Update D network: maximize log(D(x)) + log(1 - D(G(z)))
